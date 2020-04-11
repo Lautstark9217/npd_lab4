@@ -38,6 +38,7 @@ void clientConnect(Client* client)
     //将sock和管道读端描述符都添加到内核事件表中
     addfd(client->epfd, client->sockfd);
     addfd(client->epfd, client->pipe_fd[0]);
+    printf("cl connect out\n");
 }
 void clientClose(Client* client)
 {
@@ -48,9 +49,10 @@ void clientClose(Client* client)
     }
     else close(client->pipe_fd[1]);
 }
-void _clientStart(Client* client)
+void clientStart(Client* client)
 {
     static struct epoll_event ev[2];
+    clientInit(client);
     clientConnect(client);
     client->pid=fork();
     if(client->pid < 0) {
@@ -61,8 +63,8 @@ void _clientStart(Client* client)
         // 进入子进程执行流程
         //子进程负责写入管道，因此先关闭读端
         close(client->pipe_fd[0]); 
-        printf("Please type 'exit' to exit the arena.\nPlease type the ID of who you want to challenge to start a game.");
-        printf("Please type 'rank' to get the current ranking\n");
+        printf("Please type 'exit' to exit the arena.\nPlease type the ID of who you want to challenge to start a game.\n");
+        printf("Please type 'rank' to get the current ranking.\n");
         printf("When you are in game,type numbers:\n");
         printf("1-rock\n");
         printf("2-paper\n");
@@ -119,10 +121,12 @@ void _clientStart(Client* client)
         close(client->pipe_fd[1]); 
         // 主循环(epoll_wait)
         while(client->stat) {
+            printf("In cli f main cycle\n");
             int epoll_events_count = epoll_wait(client->epfd, ev, 2, -1 );
             //处理就绪事件
             for(int i = 0; i < epoll_events_count ; ++i)
             {
+                printf("cli f epoll\n");
                 memset(client->recv_buf,0,sizeof(client->recv_buf));
                 //服务端发来消息
                 if(ev[i].data.fd == client->sockfd)
@@ -141,6 +145,7 @@ void _clientStart(Client* client)
                     }
                     else 
                     {
+                        printf("%s\n",client->msg.content);
                         switch (client->stat)
                         {
                             case STAT_WAITID:
@@ -202,6 +207,7 @@ void _clientStart(Client* client)
                         client->stat = STAT_OFF;
                     else {
                         // 将从管道中读取的字符串信息发送给服务端
+                        printf("MSG send cli\n");
                         send(client->sockfd, client->recv_buf, sizeof(client->recv_buf), 0);
                     }
                 }
@@ -210,8 +216,4 @@ void _clientStart(Client* client)
     }
     // 退出进程
     clientClose(client);
-}
-void clientStart(Client* client)
-{
-
 }

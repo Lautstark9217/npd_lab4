@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11
+CFLAGS = -std=c++11 -g
 
 all: clientMain.c serverMain.c server.o client.o
 	$(CC) $(CFLAGS) serverMain.c server.o -o game_server

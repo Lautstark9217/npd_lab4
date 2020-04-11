@@ -62,10 +62,11 @@ void serverStart(Server* server)
                 addfd(server->epfd, clientfd);
                 server->List[server->pList].sockfd=clientfd;
                 server->List[server->pList].stat=STAT_FREE;
+                server->pList++;
                 printf("Add new clientfd = %d to epoll\n",clientfd); 
                 char message[BUF_SIZE];
                 bzero(message, BUF_SIZE);
-                sprintf(message, SERVER_WELCOME, clientfd);
+                sprintf(message, SERVER_WELCOME, "test");
                 int ret = send(clientfd, message, BUF_SIZE, 0);
                 if(ret < 0) {
                     perror("send error");
