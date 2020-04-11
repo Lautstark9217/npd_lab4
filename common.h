@@ -18,6 +18,7 @@
 #define SERVER_PORT 7788
 #define EPOLL_SIZE 5000
 #define BUF_SIZE 0xFFFF
+#define ID_SIZE 10
 #define SERVER_WELCOME "Welcome you join to the game! Your ID is: %s\n"
 #define SERVER_MULTI_ID "This ID has been used by another user.\n"
 #define SERVER_LEAVE "User %s has left the game.\n"
@@ -47,9 +48,9 @@
 struct _Msg
 {
     int type;
-    char fromID[10];
-    char toID[10];
-    char content[BUF_SIZE];
+    int fromID;
+    int toID;
+    char content[ID_SIZE];
 };
 typedef struct _Msg Msg;
 

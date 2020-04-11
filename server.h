@@ -3,7 +3,7 @@
 #include "common.h"
 struct _clientlist
 {
-    char userID[10];
+    char userID[ID_SIZE];
     int sockfd;
     int stat;
 };
@@ -21,6 +21,6 @@ typedef struct _Server Server;
 void serverInit(Server* server);
 void serverClose(Server* server);
 void serverStart(Server* server);
-void serverSendMsg(Server* server);
+int serverSendMsg(Server* server,int sockfd);
 
 #endif

@@ -18,7 +18,7 @@ struct _Client {
     Msg msg;
     char send_buf[BUF_SIZE];
     char recv_buf[BUF_SIZE];
-    char myid[10];
+    char myid[ID_SIZE];
     struct sockaddr_in serverAddr;
 };
 typedef struct _Client Client;

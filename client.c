@@ -74,7 +74,7 @@ void clientStart(Client* client)
         while(client->stat){
             //清空结构体
             memset(client->msg.content,0,sizeof(client->msg.content));
-            fgets(client->msg.content, BUF_SIZE, stdin);
+            //fgets(client->msg.content, ID_SIZE, stdin);
             // 客户输出exit,退出
             if(strncasecmp(client->msg.content, "exit", strlen("exit")) == 0 && client->stat!=STAT_DUEL){
                 client->stat = STAT_OFF;
@@ -131,6 +131,7 @@ void clientStart(Client* client)
                 //服务端发来消息
                 if(ev[i].data.fd == client->sockfd)
                 {
+                    printf("recv serv msg\n");
                     //接受服务端广播消息
                     int ret = recv(client->sockfd, client->recv_buf, BUF_SIZE, 0);
                     //清空结构体
@@ -165,7 +166,7 @@ void clientStart(Client* client)
                                     printf("Please choose another person.\n");
                                     break;
                                 case MSG_CHAL_REP_OK:
-                                    printf("You are about to challenge user ID: %s!\n",client->msg.content);
+                                    printf("You are about to challenge user ID: %s!\nAnd... game starts now!\n",client->msg.content);
                                     client->stat=STAT_DUEL;
                                     break;
                                 case MSG_CHALREQ_DECL:
