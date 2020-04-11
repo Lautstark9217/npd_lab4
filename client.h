@@ -10,8 +10,10 @@ struct _Client {
     int epfd;
     // pipe connect
     int pipe_fd[2];
-    //s
+    // this player's status
     int stat;
+    //used when received a challenge
+    int receive_decide;
 
     Msg msg;
     char send_buf[BUF_SIZE];

@@ -5,14 +5,11 @@ void clientInit(Client* client)
     client->serverAddr.sin_family = PF_INET;
     client->serverAddr.sin_port = htons(SERVER_PORT);
     client->serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP);
-    // 初始化socket
     client->sockfd = 0;
-    // 初始化进程号
     client->pid = 0;
-    // 客户端状态
     client->stat=STAT_WAITID;
-    // epoll fd
     client->epfd = 0;
+    client->receive_decide=0;
 }
 void clientConnect(Client* client)
 {
@@ -51,7 +48,7 @@ void clientClose(Client* client)
     }
     else close(client->pipe_fd[1]);
 }
-void clientStart(Client* client)
+void _clientStart(Client* client)
 {
     static struct epoll_event ev[2];
     clientConnect(client);
@@ -70,6 +67,7 @@ void clientStart(Client* client)
         printf("1-rock\n");
         printf("2-paper\n");
         printf("3-scissors\n");
+        printf("Have fun!\n");
         // 如果客户端运行正常则不断读取输入发送给服务端
         while(client->stat){
             //清空结构体
@@ -145,37 +143,53 @@ void clientStart(Client* client)
                     {
                         switch (client->stat)
                         {
-                        case STAT_WAITID:
-                            if(client->msg.type==MSG_IDOK)
-                            {
-                                printf("You have entered the arena.\n");
-                                client->stat=STAT_FREE;
-                            }
-                            else if(client->msg.type==MSG_DUPID)
-                                printf("This ID has been taken by other user.\nPlease choose another one:\n");
-                            break;
-                        case STAT_FREE:
-                            switch (client->msg.type)
-                            {
-                            case MSG_CHAL_REP_INCHAL:
-                                printf("This person is currently in another game.\n");
-                                printf("Please choose another person.\n");
+                            case STAT_WAITID:
+                                if(client->msg.type==MSG_IDOK)
+                                {
+                                    printf("You have entered the arena.\n");
+                                    client->stat=STAT_FREE;
+                                }
+                                else if(client->msg.type==MSG_DUPID)
+                                    printf("This ID has been taken by other user.\nPlease choose another one:\n");
                                 break;
-                            case MSG_CHAL_REP_OK:
-                                printf("You are about to challenge user ID: %s!\n",client->msg.content);
-                                client->stat=STAT_DUEL;
-                                break;
-                            case MSG_CHALREQ_DECL:
-                                printf("This user has declined your invite\n");
-                            case MSG_CHALQUERY:
-                                printf("You are challenged by user ID: %s.\n",client->msg.content);
-                                printf("Please type Y to accept, or N to decline.\n");
-
+                            case STAT_FREE:
+                                switch (client->msg.type)
+                                {
+                                case MSG_CHAL_REP_INCHAL:
+                                    printf("This person is currently in another game.\n");
+                                    printf("Please choose another person.\n");
+                                    break;
+                                case MSG_CHAL_REP_OK:
+                                    printf("You are about to challenge user ID: %s!\n",client->msg.content);
+                                    client->stat=STAT_DUEL;
+                                    break;
+                                case MSG_CHALREQ_DECL:
+                                    printf("This user has declined your invite\n");
+                                case MSG_CHALQUERY:
+                                    printf("You are challenged by user ID: %s.\n",client->msg.content);
+                                    printf("Please type Y to accept, or N to decline.\n");
+                                    do
+                                    {
+                                      char p;
+                                      scanf("%c",&p);
+                                      if(p=='Y')
+                                      {
+                                          client->receive_decide=1;
+                                          break;
+                                      }
+                                      else if(p=='N')
+                                      {
+                                          client->receive_decide=2;
+                                          break;
+                                      }
+                                      else printf("Please type Y/N!\n");
+                                    } while (1);
+                                    
+                                default:
+                                    break;
+                                }
                             default:
                                 break;
-                            }
-                        default:
-                            break;
                         }
                     }
                 }
@@ -194,7 +208,10 @@ void clientStart(Client* client)
             }//for
         }//while
     }
-    
     // 退出进程
-    Close();
+    clientClose(client);
+}
+void clientStart(Client* client)
+{
+
 }
