@@ -69,16 +69,17 @@ void serverStart(Server* server)
                 int ret = send(clientfd, message, BUF_SIZE, 0);
                 if(ret < 0) {
                     perror("send error");
-                    Close();
+                    serverClose(server);
                     exit(-1);
                 }
             }
             //处理用户发来的消息，并广播，使其他用户收到信息
             else {   
-                int ret = SendBroadcastMessage(sockfd);
+                //int ret = SendBroadcastMessage(sockfd);
+                int ret=1;
                 if(ret < 0) {
                     perror("error");
-                    Close();
+                    serverClose(server);
                     exit(-1);
                 }
             }

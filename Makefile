@@ -12,4 +12,4 @@ client.o: client.c client.h common.h
 	$(CC) $(CFLAGS) -c client.c
 
 clean:
-	rm -f *.o game_server game_clientc
+	rm -f *.o game_server game_client

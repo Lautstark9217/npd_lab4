@@ -13,7 +13,7 @@ void clientInit(Client* client)
 }
 void clientConnect(Client* client)
 {
-    printf("Connecting to server: %d : %d\n",SERVER_IP,SERVER_PORT);
+    printf("Connecting to server: %s : %d\n",SERVER_IP,SERVER_PORT);
     client->sockfd=socket(PF_INET,SOCK_STREAM,0);
     if(client->sockfd < 0) {
         perror("sock error");
@@ -95,7 +95,7 @@ void _clientStart(Client* client)
                         do
                         {
                            scanf("%s",client->msg.content);
-                           if(strlen(client->msg.content)==1 && client->msg.content[0]>'0' && client->msg.content<'4') break;
+                           if(strlen(client->msg.content)==1 && client->msg.content[0]>'0' && client->msg.content[0]<'4') break;
                            else printf("Illegal put!\n");
                         } while (1);
                         client->msg.type=MSG_CHAL_PUT;
